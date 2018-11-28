@@ -13,4 +13,16 @@ Sample output :
 
  * document : current document
  * class : current classification
+
+
+Results :
+2018-11-28 brand with natural bayes with default tokenizer and stemmer :
+{ success: 481,
+  failures: 26717,
+  'success rate': 0.01768512390616957 }
+
+2018-11-29 brand with natural bayes with bayes word of bags :
+{ success: 481,
+  failures: 26717,
+  'success rate': 0.01768512390616957 }
  

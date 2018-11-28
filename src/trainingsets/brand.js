@@ -9,7 +9,8 @@ const path = require("path"),
         .Transform,
     Writable = require("stream")
         .Transform,
-    Promise = require("bluebird");
+    Promise = require("bluebird"),
+    logger = require(path.join(__dirname, "..", "logger"));
 
 class BrandTrainingSet {
 
@@ -53,15 +54,18 @@ class BrandTrainingSet {
                 writableObjectMode: true,
                 readableObjectMode: true,
                 transform: (chunk, encoding, callback) => {
-                    callback(null, {
-                        "document": chunk && chunk.extras &&
-                            chunk.extras.nom ? chunk.extras
-                                .nom : "",
+                    const output = {
                         "class": chunk && chunk.brand ?
                             stringTransform.toLowerCase(
                                 stringTransform.unaccent(
-                                    chunk.brand)) : ""
-                    });
+                                    chunk.brand)) : "",
+                        "document": chunk && chunk.extras &&
+                            chunk.extras.nom ? chunk.extras
+                                .nom : ""
+                    };
+                    logger.info("trainingset brand transform",
+                        output);
+                    callback(null, output);
                 }
             }));
     }

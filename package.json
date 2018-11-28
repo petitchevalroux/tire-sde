@@ -26,8 +26,10 @@
   "dependencies": {
     "bluebird": "^3.5.3",
     "remove-accents-diacritics": "^1.0.2",
+    "winston": "^3.1.0",
     "xml-nodes": "^0.1.5",
     "xml-objects": "^1.0.1",
-    "xregexp": "^4.2.0"
+    "xregexp": "^4.2.0",
+    "yargs": "^12.0.5"
   }
 }
