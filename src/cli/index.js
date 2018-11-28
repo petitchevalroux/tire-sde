@@ -22,4 +22,23 @@ require('yargs') // eslint-disable-line
         (argv) => {
             require(path.join(__dirname, "train"))(argv);
         })
+    .command(
+        "trainingset [training]", "output training set to stdout",
+        (yargs) => {
+            yargs
+                .positional("training", {
+                    describe: "training set name"
+                })
+                .option("stats", {
+                    default: false,
+                    describe: "display training set statitics"
+                })
+                .option("verbose", {
+                    alias: "v",
+                    default: false
+                });
+        },
+        (argv) => {
+            require(path.join(__dirname, "trainingset"))(argv);
+        })
     .argv;

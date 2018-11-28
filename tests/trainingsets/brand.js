@@ -82,28 +82,4 @@ describe("brand training set", () => {
                 });
         });
     });
-
-    describe("getClasses", () => {
-        it("return brand as lower case string", () => {
-            testStream.write({
-                brand: "MICHELIN"
-            });
-            testStream.write({
-                brand: "Pirelli"
-            });
-            testStream.write({
-                brand: "AVon"
-            });
-            testStream.end();
-            return brandTrainingSet.getClasses()
-                .then(classes => {
-                    assert.deepEqual(classes, [
-                        "avon", "michelin",
-                        "pirelli"
-                    ]);
-                    return classes;
-                });
-        });
-    });
-
 });

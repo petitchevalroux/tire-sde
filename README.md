@@ -17,6 +17,7 @@ Sample output :
 
 ## Cli
 
+### Training
 ```
 ./src/cli/index.js train --help
 index.js train [classifier] [training]
@@ -33,6 +34,21 @@ Options:
   --verbose, -v                                                  [défaut: false]
 ```
 
+### Trainingset informations
+```
+index.js trainingset [training]
+
+output training set to stdout
+
+Positionals:
+  training  training set name
+
+Options:
+  --help         Affiche de l'aide                                     [booléen]
+  --version      Affiche le numéro de version                          [booléen]
+  --stats        display training set statitics                  [défaut: false]
+  --verbose, -v                                                  [défaut: false]
+```
 
 Results :
 2018-11-28 brand with natural bayes with default tokenizer and stemmer :
