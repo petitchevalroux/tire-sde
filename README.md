@@ -15,6 +15,25 @@ Sample output :
  * class : current classification
 
 
+## Cli
+
+```
+./src/cli/index.js train --help
+index.js train [classifier] [training]
+
+train a classifier
+
+Positionals:
+  classifier  classifier to train
+  training    training set to train with
+
+Options:
+  --help         Affiche de l'aide                                     [booléen]
+  --version      Affiche le numéro de version                          [booléen]
+  --verbose, -v                                                  [défaut: false]
+```
+
+
 Results :
 2018-11-28 brand with natural bayes with default tokenizer and stemmer :
 { success: 481,
