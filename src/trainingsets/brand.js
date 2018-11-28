@@ -83,7 +83,7 @@ class BrandTrainingSet {
                                 values, 0.25),
                             "2th-quartile": quantile(
                                 values, 0.5),
-                            "3th-quartile": quantile(
+                            "3rd-quartile": quantile(
                                 values, 0.75),
                             "frequencies": frequencies
                         }
