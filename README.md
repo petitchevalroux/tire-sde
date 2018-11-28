@@ -60,4 +60,21 @@ Results :
 { success: 481,
   failures: 26717,
   'success rate': 0.01768512390616957 }
- 
+
+Brand training set statistics : 
+```
+"documents": {
+    "count": 27198
+},
+"classes": {
+    "count": 170,
+    "max": 2716,
+    "min": 1,
+    "mean": 159.98823529411771,
+    "1th-quartile": 2,
+    "2th-quartile": 6,
+    "3th-quartile": 75
+}    
+```
+Big classes distribution may perform poorly with bayes => Need to validate this by filtering training set with
+classes having high frequencies (> 3rd quartile) 
