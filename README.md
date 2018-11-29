@@ -44,9 +44,11 @@ Positionals:
   training  training set name
 
 Options:
-  --help         Affiche de l'aide                                     [booléen]
-  --version      Affiche le numéro de version                          [booléen]
-  --stats        display training set statitics                  [défaut: false]
+  --help                     Affiche de l'aide                         [booléen]
+  --version                  Affiche le numéro de version              [booléen]
+  --stats                    display training set statitics      [défaut: false]
+  --filterClassMinFrequency  filter classes with less frequency
+                                                        [nombre] [défaut: false]
   --verbose, -v                                                  [défaut: false]
 ```
 

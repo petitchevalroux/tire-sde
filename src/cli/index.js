@@ -33,6 +33,11 @@ require('yargs') // eslint-disable-line
                     default: false,
                     describe: "display training set statitics"
                 })
+                .option("filterClassMinFrequency", {
+                    default: false,
+                    number: true,
+                    describe: "filter classes with less frequency"
+                })
                 .option("verbose", {
                     alias: "v",
                     default: false

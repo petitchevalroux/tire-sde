@@ -19,31 +19,75 @@ class CommandTrainingSet {
         if (!options.verbose) {
             logger.level = "error";
         }
-
-        const setStream = this.getSetStream(options.training);
-        if (options.stats) {
-            this
-                .getStatistics(setStream)
-                .then(statistics => {
-                    process.stdout.write(JSON.stringify(statistics,
-                        null, 4));
-                    return statistics;
-                })
-                .catch(error => {
-                    throw error;
-                });
-            return;
-        }
-
-        setStream
-            .pipe(new Transform({
-                writableObjectMode: true,
-                readableObjectMode: false,
-                transform: (chunk, encoding, callback) => {
-                    callback(null, JSON.stringify(chunk) + "\n");
+        const self = this;
+        this
+            .filter(options.training, options.filterClassMinFrequency)
+            .then(setStream => {
+                if (options.stats) {
+                    self
+                        .getStatistics(setStream)
+                        .then(statistics => {
+                            process.stdout.write(JSON.stringify(
+                                statistics,
+                                null, 4));
+                            return statistics;
+                        })
+                        .catch(error => {
+                            throw error;
+                        });
+                    return;
                 }
-            }))
-            .pipe(process.stdout);
+                setStream
+                    .pipe(new Transform({
+                        writableObjectMode: true,
+                        readableObjectMode: false,
+                        transform: (chunk, encoding, callback) => {
+                            callback(null, JSON.stringify(
+                                chunk) + "\n");
+                        }
+                    }))
+                    .pipe(process.stdout);
+                return setStream;
+            })
+            .catch(error => {
+                throw error;
+            });
+    }
+
+    filter(setName, filterClassMinFrequency) {
+        if (!filterClassMinFrequency) {
+            return Promise.resolve(this.getSetStream(setName));
+        }
+        const self = this;
+        return this
+            .getStatistics(self.getSetStream(setName))
+            .then(statistics => {
+                const classes = new Set(self.getValidClasses(statistics
+                    .classes.frequencies,
+                filterClassMinFrequency));
+                return self
+                    .getSetStream(setName)
+                    .pipe(new Transform({
+                        writableObjectMode: true,
+                        readableObjectMode: true,
+                        transform: (chunk, encoding, callback) => {
+                            if (classes.has(chunk.class)) {
+                                callback(null, chunk);
+                                return;
+                            }
+                            callback();
+                        }
+                    }));
+            });
+    }
+
+    getValidClasses(frequencies, minFrequency) {
+        return frequencies.filter((data) => {
+            return data[1] >= minFrequency;
+        })
+            .map(data => {
+                return data[0];
+            });
     }
 
     getSetStream(training) {
@@ -53,7 +97,7 @@ class CommandTrainingSet {
         return set.getStream();
     }
 
-    getStatistics(setStream) {
+    getStatistics(stream) {
         return new Promise((resolve, reject) => {
             try {
                 const classes = new Map(),
@@ -121,7 +165,7 @@ class CommandTrainingSet {
                         }
                     });
                 });
-                setStream.pipe(writable);
+                stream.pipe(writable);
             } catch (error) {
                 return reject(error);
             }
