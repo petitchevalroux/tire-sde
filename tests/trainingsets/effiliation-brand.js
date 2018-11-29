@@ -2,14 +2,14 @@
 const path = require("path"),
     assert = require("assert"),
     BrandTrainingSet = require(path.join(__dirname, "..", "..", "src",
-        "trainingsets", "brand")),
+        "trainingsets", "effiliation-brand")),
     brandTrainingSet = new BrandTrainingSet(),
     Promise = require("bluebird"),
     PassThrough = require("stream")
         .PassThrough,
     sinon = require("sinon");
 
-describe("brand training set", () => {
+describe("effiliation-brand training set", () => {
 
     const testStream = new PassThrough({
         writableObjectMode: true,
