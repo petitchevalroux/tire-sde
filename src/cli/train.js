@@ -26,7 +26,7 @@ class CommandTrain {
                 return classifier.score(trainingSet.getStream(), data);
             })
             .then(stats => {
-                process.write(JSON.stringify(stats));
+                process.stdout.write(JSON.stringify(stats));
                 return stats;
             })
             .catch(err => {
