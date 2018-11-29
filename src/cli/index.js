@@ -11,16 +11,16 @@ require('yargs') // eslint-disable-line
                     describe: "classifier to train"
                 })
                 .positional("training", {
-                    describe: "training set to train with"
+                    describe: "training set to train with file or trainingset name"
                 })
                 .option("verbose", {
                     alias: "v",
                     default: false
                 });
-
         },
         (argv) => {
-            require(path.join(__dirname, "train"))(argv);
+            const command = new(require(path.join(__dirname, "train")))();
+            command.run(argv);
         })
     .command(
         "trainingset [training]", "output training set to stdout",
