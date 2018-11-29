@@ -27,6 +27,7 @@
     "bluebird": "^3.5.3",
     "compute-mean": "^3.0.0",
     "compute-quantile": "^1.0.1",
+    "json-stream": "^1.0.0",
     "remove-accents-diacritics": "^1.0.2",
     "winston": "^3.1.0",
     "xml-nodes": "^0.1.5",

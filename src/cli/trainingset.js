@@ -8,7 +8,9 @@ const path = require("path"),
         .Transform,
     quantile = require("compute-quantile"),
     Promise = require("bluebird"),
-    mean = require("compute-mean");
+    mean = require("compute-mean"),
+    fs = require("fs"),
+    getJsonStream = require("json-stream");
 
 class CommandTrainingSet {
     run(options) {
@@ -91,10 +93,15 @@ class CommandTrainingSet {
     }
 
     getSetStream(training) {
-        const set = new(require(path.join(__dirname, "..",
+        const trainingModulePath = path.join(__dirname, "..",
             "trainingsets",
-            training)));
-        return set.getStream();
+            training + ".js");
+        if (fs.existsSync(trainingModulePath)) {
+            const set = new(require(trainingModulePath));
+            return set.getStream();
+        }
+        return fs.createReadStream(training)
+            .pipe(getJsonStream());
     }
 
     getStatistics(stream) {

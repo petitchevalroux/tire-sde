@@ -1,7 +1,8 @@
 "use strict";
 const path = require("path"),
     process = require("process"),
-    logger = require(path.join(__dirname, "..", "logger"));
+    logger = require(path.join(__dirname, "..", "logger")),
+    trainingSetCommand = new(require(path.join(__dirname, "trainingset")))();
 class CommandTrain {
     run(options) {
         if (!options.classifier) {
@@ -14,16 +15,14 @@ class CommandTrain {
             logger.level = "error";
         }
         const classifier = new(require(path.join(__dirname, "..",
-                "classifiers",
-                options.classifier)))(),
-            trainingSet = new(require(path.join(__dirname, "..",
-                "trainingsets",
-                options.training)));
+            "classifiers",
+            options.classifier)))();
 
         classifier
-            .train(trainingSet.getStream())
+            .train(trainingSetCommand.getSetStream(options.training))
             .then(data => {
-                return classifier.score(trainingSet.getStream(), data);
+                return classifier.score(trainingSetCommand.getSetStream(
+                    options.training), data);
             })
             .then(stats => {
                 process.stdout.write(JSON.stringify(stats));
