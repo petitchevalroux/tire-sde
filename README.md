@@ -80,3 +80,83 @@ Brand training set statistics :
 ```
 Big classes distribution may perform poorly with bayes => Need to validate this by filtering training set with
 classes having high frequencies (> 3rd quartile) 
+
+2018-11-30
+Brand training set keeping classes with > 2000 frequency :
+```
+node src/cli/index.js trainingset ./data/brand-f2000.jsonl --stats
+{
+    "documents": {
+        "count": 9208
+    },
+    "classes": {
+        "count": 4,
+        "max": 2716,
+        "min": 2039,
+        "mean": 2302,
+        "1th-quartile": 2103.5,
+        "2th-quartile": 2226.5,
+        "3rd-quartile": 2500.5
+    }
+}
+node src/cli/index.js train bayes ./data/brand-f2000.jsonl
+{"success":9208,"failures":0,"success rate":1}
+```
+=> Perfect result
+3 hypotheses to explain differences with previous results :
+ * less document = betters results
+ * less classes = better results
+ * more balanced training set = better results
+
+With  less documents : 
+```
+node src/cli/index.js trainingset ./data/brand-f2000-d50.jsonl --stats
+{
+    "documents": {
+        "count": 200
+    },
+    "classes": {
+        "count": 4,
+        "max": 50,
+        "min": 50,
+        "mean": 50,
+        "1th-quartile": 50,
+        "2th-quartile": 50,
+        "3rd-quartile": 50
+    }
+}
+node src/cli/index.js train bayes ./data/brand-f2000-d50.jsonl 
+{"success":200,"failures":0,"success rate":1}
+```
+=> Perfect result
+
+As brand-f2000.jsonl (9208 documents) and brand-f2000-d50.jsonl (200 documents) have a 100% success rate we can remove "less document = betters results" from previous hypotheses.  
+
+2 hypotheses left :
+ * less classes = better results
+ * more balanced training set = better results
+
+With more classes :
+```
+node src/cli/index.js trainingset ./data/brand-f50-d50.jsonl --stats
+{
+    "documents": {
+        "count": 2250
+    },
+    "classes": {
+        "count": 45,
+        "max": 50,
+        "min": 50,
+        "mean": 50,
+        "1th-quartile": 50,
+        "2th-quartile": 50,
+        "3rd-quartile": 50
+    }
+}
+node src/cli/index.js train bayes ./data/brand-f50-d50.jsonl 
+{"success":2242,"failures":8,"success rate":0.9964444444444445}
+```
+
+=> Mostly perfect result
+
+So we can say that more balanced training set has better results and classes count has a lightest impact prediction quality.

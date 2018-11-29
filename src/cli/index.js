@@ -38,6 +38,11 @@ require('yargs') // eslint-disable-line
                     number: true,
                     describe: "filter classes with less frequency"
                 })
+                .option("maxDocumentsPerClass", {
+                    default: false,
+                    number: true,
+                    describe: "limite up to maxDocumentsPerClass documents per class"
+                })
                 .option("verbose", {
                     alias: "v",
                     default: false

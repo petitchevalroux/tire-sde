@@ -23,7 +23,11 @@ class CommandTrainingSet {
         }
         const self = this;
         this
-            .filter(options.training, options.filterClassMinFrequency)
+            .filter(
+                options.training,
+                options.filterClassMinFrequency,
+                options.maxDocumentsPerClass
+            )
             .then(setStream => {
                 if (options.stats) {
                     self
@@ -56,8 +60,8 @@ class CommandTrainingSet {
             });
     }
 
-    filter(setName, filterClassMinFrequency) {
-        if (!filterClassMinFrequency) {
+    filter(setName, filterClassMinFrequency, maxDocumentsPerClass) {
+        if (!filterClassMinFrequency && !maxDocumentsPerClass) {
             return Promise.resolve(this.getSetStream(setName));
         }
         const self = this;
@@ -65,15 +69,31 @@ class CommandTrainingSet {
             .getStatistics(self.getSetStream(setName))
             .then(statistics => {
                 const classes = new Set(self.getValidClasses(statistics
-                    .classes.frequencies,
-                filterClassMinFrequency));
+                        .classes.frequencies,
+                    filterClassMinFrequency)),
+                    classesDocuments = new Map();
                 return self
                     .getSetStream(setName)
                     .pipe(new Transform({
                         writableObjectMode: true,
                         readableObjectMode: true,
                         transform: (chunk, encoding, callback) => {
-                            if (classes.has(chunk.class)) {
+                            let previous = classesDocuments
+                                .get(chunk.class);
+                            if (!previous) {
+                                previous = 0;
+                            }
+                            classesDocuments.set(chunk.class,
+                                previous + 1);
+                            if (
+                                (!filterClassMinFrequency ||
+                                    classes.has(chunk.class)
+                                ) &&
+                                (!maxDocumentsPerClass ||
+                                    classesDocuments.get(
+                                        chunk.class) <=
+                                    maxDocumentsPerClass)
+                            ) {
                                 callback(null, chunk);
                                 return;
                             }
