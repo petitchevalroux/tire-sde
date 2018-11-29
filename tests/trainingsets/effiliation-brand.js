@@ -45,7 +45,10 @@ describe("effiliation-brand training set", () => {
 
         it("return brand as lower case string", () => {
             testStream.write({
-                brand: "MICHELIN"
+                brand: "MICHELIN",
+                extras: {
+                    nom: "PNEU MICHéLIN PILOT SPORT 4 205/40R17 84 Y"
+                }
             });
             return getData()
                 .then(data => {
@@ -57,7 +60,10 @@ describe("effiliation-brand training set", () => {
 
         it("return remove accent from brand", () => {
             testStream.write({
-                brand: "MiCHéLIà"
+                brand: "MiCHéLIà",
+                extras: {
+                    nom: "PNEU MICHéLIN PILOT SPORT 4 205/40R17 84 Y"
+                }
             });
             return getData()
                 .then(data => {
@@ -69,6 +75,7 @@ describe("effiliation-brand training set", () => {
 
         it("return document without modifications", () => {
             testStream.write({
+                brand: "MiCHéLIà",
                 extras: {
                     nom: "PNEU MICHéLIN PILOT SPORT 4 205/40R17 84 Y"
                 }

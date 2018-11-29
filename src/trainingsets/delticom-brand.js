@@ -39,6 +39,10 @@ class DelticomBrandTrainingSet {
                         "document": values[2] ? values[2] :
                             ""
                     };
+                    if (!output.class || !output.document) {
+                        callback();
+                        return;
+                    }
                     logger.info("trainingset brand transform",
                         output);
                     callback(null, output);

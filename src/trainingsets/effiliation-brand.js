@@ -35,6 +35,10 @@ class BrandTrainingSet {
                     };
                     logger.info("trainingset brand transform",
                         output);
+                    if (!output.class || !output.document) {
+                        callback();
+                        return;
+                    }
                     callback(null, output);
                 }
             }));
