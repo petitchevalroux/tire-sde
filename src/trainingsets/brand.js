@@ -7,94 +7,12 @@ const path = require("path"),
     Effiliation = require(path.join(__dirname, "..", "libraries", "effiliation")),
     Transform = require("stream")
         .Transform,
-    Writable = require("stream")
-        .Transform,
-    Promise = require("bluebird"),
-    logger = require(path.join(__dirname, "..", "logger")),
-    quantile = require("compute-quantile"),
-    mean = require("compute-mean");
+    logger = require(path.join(__dirname, "..", "logger"));
 
 class BrandTrainingSet {
 
     constructor() {
         this.effiliation = new Effiliation();
-    }
-
-    getStatistics() {
-        const self = this;
-        return new Promise((resolve, reject) => {
-            try {
-                const classes = new Map(),
-                    writable = new Writable({
-                        "objectMode": true,
-                        "write": (chunk, encoding, callback) => {
-                            let previous = classes.get(
-                                chunk.class);
-                            if (!previous) {
-                                previous = 0;
-                            }
-                            classes.set(chunk.class,
-                                previous + 1);
-                            callback();
-                        }
-                    });
-                writable.on("error", (error) => {
-                    reject(error);
-                });
-                writable.on("finish", () => {
-                    const values = Array.from(classes.values()),
-                        keys = Array.from(classes.keys()),
-                        frequencies = keys.sort((first,
-                            second) => {
-                            const firstFreq = classes.get(
-                                    first),
-                                secondFreq = classes.get(
-                                    second);
-                            if (firstFreq > secondFreq) {
-                                return -1;
-                            } else if (firstFreq <
-                                secondFreq) {
-                                return 1;
-                            }
-                            return 0;
-                        })
-                            .map(classification => {
-                                return [classification,
-                                    classes.get(
-                                        classification)
-                                ];
-                            });
-                    resolve({
-                        "documents": {
-                            count: values.reduce((
-                                acc, value) => {
-                                return acc +
-                                    value;
-                            })
-                        },
-                        "classes": {
-                            count: keys.length,
-                            "max": Math.max(...
-                            values),
-                            "min": Math.min(...
-                            values),
-                            "mean": mean(values),
-                            "1th-quartile": quantile(
-                                values, 0.25),
-                            "2th-quartile": quantile(
-                                values, 0.5),
-                            "3rd-quartile": quantile(
-                                values, 0.75),
-                            "frequencies": frequencies
-                        }
-                    });
-                });
-                self.getStream()
-                    .pipe(writable);
-            } catch (error) {
-                return reject(error);
-            }
-        });
     }
 
     getStream() {

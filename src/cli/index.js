@@ -39,6 +39,7 @@ require('yargs') // eslint-disable-line
                 });
         },
         (argv) => {
-            require(path.join(__dirname, "trainingset"))(argv);
+            const command = new(require(path.join(__dirname, "trainingset")))();
+            command.run(argv);
         })
     .argv;
