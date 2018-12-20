@@ -166,6 +166,24 @@ So we can say that more balanced training set has better results and classes cou
 2018-12-20
 
 Generate brand.jsonl using delticom + effiliation trainingset
+```
+node src/cli/index.js trainingset ./data/brand.jsonl --stats
+node src/cli/index.js trainingset ./data/brand.jsonl --stats
+{
+    "documents": {
+        "count": 33147
+    },
+    "classes": {
+        "count": 187,
+        "max": 3387,
+        "min": 1,
+        "mean": 177.25668449197846,
+        "1th-quartile": 2,
+        "2th-quartile": 6,
+        "3rd-quartile": 66
+    }
+}
+```
 Generate  brand-f66.jsonl by filtering class with less than 3rd quartile document
 ```
 node src/cli/index.js trainingset ./data/brand-f66.jsonl --stats
