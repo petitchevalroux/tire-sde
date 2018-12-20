@@ -237,3 +237,11 @@ Using this model to classify with the original set :
 node src/cli/index.js train --load ./data/models/brand.json bayes ./data/brand.jsonl
 {"success":19536,"failures":13611,"success rate":0.5893746040365644}
 ```
+
+Same results with bayes-word-bags :
+```
+node src/cli/index.js train --save ./data/models/brand.json bayes-word-bags ./data/brand-f66-d368.jsonl
+{"success":12579,"failures":142,"success rate":0.9888373555538087}
+node src/cli/index.js train --load ./data/models/brand.json bayes-word-bags ./data/brand.jsonl
+{"success":19478,"failures":13669,"success rate":0.587624822759224}
+```
