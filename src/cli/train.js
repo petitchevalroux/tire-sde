@@ -18,19 +18,35 @@ class CommandTrain {
             "classifiers",
             options.classifier)))();
 
-        classifier
-            .train(trainingSetCommand.getSetStream(options.training))
-            .then(data => {
+        this.getModel(classifier, options)
+            .then(model => {
                 return classifier.score(trainingSetCommand.getSetStream(
-                    options.training), data);
+                    options.training), model)
+                    .then((stats) => {
+                        return [stats, model];
+                    });
             })
-            .then(stats => {
+            .then(([stats, model]) => {
                 process.stdout.write(JSON.stringify(stats));
+                if (options.save) {
+                    return classifier.save(options.save, model)
+                        .then(() => {
+                            return stats;
+                        });
+                }
                 return stats;
             })
             .catch(err => {
                 throw err;
             });
+    }
+
+    getModel(classifier, options) {
+        if (options.load) {
+            return classifier.load(options.load);
+        }
+        return classifier
+            .train(trainingSetCommand.getSetStream(options.training));
     }
 
 }

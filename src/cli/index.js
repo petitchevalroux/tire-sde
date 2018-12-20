@@ -13,6 +13,16 @@ require('yargs') // eslint-disable-line
                 .positional("training", {
                     describe: "training set to train with file or trainingset name"
                 })
+                .option("load", {
+                    default: false,
+                    string: true,
+                    describe: "model file to load"
+                })
+                .option("save", {
+                    default: false,
+                    string: true,
+                    describe: "model file to save"
+                })
                 .option("verbose", {
                     alias: "v",
                     default: false

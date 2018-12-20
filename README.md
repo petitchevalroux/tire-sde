@@ -31,7 +31,9 @@ Positionals:
 Options:
   --help         Affiche de l'aide                                     [booléen]
   --version      Affiche le numéro de version                          [booléen]
-  --verbose, -v                                                  [défaut: false]
+  --load         model file to load        [chaine de caractère] [défaut: false]
+  --save         model file to save        [chaine de caractère] [défaut: false]
+  --verbose, -v                                                  [défaut: false]                                                 [défaut: false]
 ```
 
 ### Trainingset informations
