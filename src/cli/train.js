@@ -46,7 +46,11 @@ class CommandTrain {
             return classifier.load(options.load);
         }
         return classifier
-            .train(trainingSetCommand.getSetStream(options.training));
+            .train(
+                trainingSetCommand.getSetStream(options.training),
+                options.maxIterations ? options.maxIterations : 0,
+                options.minImprovement ? options.minImprovement : 0
+            );
     }
 
 }

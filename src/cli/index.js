@@ -23,6 +23,16 @@ require('yargs') // eslint-disable-line
                     string: true,
                     describe: "model file to save"
                 })
+                .option("minImprovement", {
+                    default: 0,
+                    number: true,
+                    describe: "minimum improvement between iteration in percent (1 => 1%)"
+                })
+                .option("maxIterations", {
+                    default: 0,
+                    number: true,
+                    describe: "maximum training iterations"
+                })
                 .option("verbose", {
                     alias: "v",
                     default: false

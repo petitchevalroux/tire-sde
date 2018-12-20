@@ -78,8 +78,13 @@ class BayesClassifier {
                 reject(error);
             });
             writable.on("finish", () => {
-                toTrainClassifier.train(maxIterations,
-                    minImprovement);
+                toTrainClassifier
+                    .train(
+                        maxIterations ? maxIterations :
+                            undefined,
+                        minImprovement ? minImprovement /
+                        100 : undefined
+                    );
                 resolve(toTrainClassifier);
             });
             trainingStream.pipe(writable);

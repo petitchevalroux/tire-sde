@@ -33,7 +33,9 @@ Options:
   --version      Affiche le numéro de version                          [booléen]
   --load         model file to load        [chaine de caractère] [défaut: false]
   --save         model file to save        [chaine de caractère] [défaut: false]
-  --verbose, -v                                                  [défaut: false]                                                 [défaut: false]
+  --verbose, -v                                                  [défaut: false]
+  --minImprovement  minimum improvement between iteration in percent (1 => 1%) [nombre] [défaut: 0]
+  --maxIterations   maximum training iterations             [nombre] [défaut: 0]
 ```
 
 ### Trainingset informations
