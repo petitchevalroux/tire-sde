@@ -160,3 +160,50 @@ node src/cli/index.js train bayes ./data/brand-f50-d50.jsonl
 => Mostly perfect result
 
 So we can say that more balanced training set has better results and classes count has a lightest impact prediction quality.
+
+2018-12-20
+
+Generate brand.jsonl using delticom + effiliation trainingset
+Generate  brand-f66.jsonl by filtering class with less than 3rd quartile document
+```
+node src/cli/index.js trainingset ./data/brand-f66.jsonl --stats
+{
+    "documents": {
+        "count": 31760
+    },
+    "classes": {
+        "count": 47,
+        "max": 3387,
+        "min": 66,
+        "mean": 675.7446808510638,
+        "1th-quartile": 162,
+        "2th-quartile": 368,
+        "3rd-quartile": 925,
+    }
+}
+node src/cli/index.js train bayes ./data/brand-f66.jsonl
+{"success":30290,"failures":1470,"success rate":0.9537153652392947}
+```
+
+Generate ./data/brand-f66-d368.jsonl by filtering documents max with median
+```
+node src/cli/index.js trainingset ./data/brand-f66-d368.jsonl --stats
+{
+    "documents": {
+        "count": 12721
+    },
+    "classes": {
+        "count": 47,
+        "max": 368,
+        "min": 66,
+        "mean": 270.6595744680852,
+        "1th-quartile": 162,
+        "2th-quartile": 368,
+        "3rd-quartile": 368,
+    }
+}
+node src/cli/index.js train bayes ./data/brand-f66-d368.jsonl
+{"success":12611,"failures":110,"success rate":0.9913528810628095}
+```
+=> Good results by filtering classes with less documents than 3th-quartile and then with limiting document to 2th-quartile per classes
+
