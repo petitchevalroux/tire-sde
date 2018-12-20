@@ -227,3 +227,13 @@ node src/cli/index.js train bayes ./data/brand-f66-d368.jsonl
 ```
 => Good results by filtering classes with less documents than 3th-quartile and then with limiting document to 2th-quartile per classes
 
+But poor results with the original set :
+Generating a model from the set
+```
+node src/cli/index.js train --save ./data/models/brand.model bayes ./data/brand-f66-d368.jsonl
+```
+Using this model to classify with the original set :
+```
+node src/cli/index.js train --load ./data/models/brand.json bayes ./data/brand.jsonl
+{"success":19536,"failures":13611,"success rate":0.5893746040365644}
+```
