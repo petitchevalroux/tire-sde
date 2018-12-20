@@ -25,7 +25,7 @@ class BayesWordBagsClassifier extends BayesClassifier {
             "transformed": transformed,
             "document": document
         });
-        return document;
+        return transformed;
     }
 
 }
