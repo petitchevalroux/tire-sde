@@ -1,22 +1,30 @@
 "use strict";
 const Writable = require("stream")
-        .Writable,
+    .Writable,
     NaturalBayesClassifier = require("natural")
-        .BayesClassifier,
+    .BayesClassifier,
     Promise = require("bluebird"),
     path = require("path"),
     logger = require(path.join(__dirname, "..", "logger"));
 class BayesClassifier {
 
 
+    /**
+     * Classify a document
+     * @param {String} document
+     * @param {Classifier} classifier
+     * @returns {Promise<String>} resulting class
+     */
     classify(document, classifier) {
-        const classification = classifier.classify(this.transformDocument(
-            document));
-        logger.info("bayes classify", {
-            "class": classification,
-            document: document
+        return new Promise((resolve) => {
+            const classification = classifier
+                .classify(this.transformDocument(document));
+            logger.info("bayes classify", {
+                "class": classification,
+                document: document
+            });
+            resolve(classification);
         });
-        return classification;
     }
 
 
@@ -81,7 +89,7 @@ class BayesClassifier {
                 toTrainClassifier
                     .train(
                         maxIterations ? maxIterations :
-                            undefined,
+                        undefined,
                         minImprovement ? minImprovement /
                         100 : undefined
                     );
@@ -104,21 +112,30 @@ class BayesClassifier {
             const writable = new Writable({
                 "objectMode": true,
                 "write": (chunk, encoding, callback) => {
-                    const resultClass = classifier.classify(
-                        chunk.document);
-                    if (self.classify(chunk.document,
-                        classifier) == chunk.class) {
-                        success++;
-                    } else {
-                        failures++;
-                    }
-                    logger.info("bayes score compare", {
-                        "class": resultClass,
-                        chunk: chunk,
-                        "success": success,
-                        "failures": failures
-                    });
-                    callback();
+                    self
+                        .classify(
+                            chunk.document,
+                            classifier
+                        )
+                        .then(classResult => {
+                            if (classResult ===
+                                chunk.class) {
+                                success++;
+                            } else {
+                                failures++;
+                            }
+                            logger.info(
+                                "bayes score compare", {
+                                    chunk: chunk,
+                                    "success": success,
+                                    "failures": failures
+                                });
+                            callback();
+                            return classResult;
+                        })
+                        .catch(error => {
+                            callback(error);
+                        });
                 }
             });
             writable.on("error", (error) => {
