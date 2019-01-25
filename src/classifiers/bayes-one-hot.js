@@ -156,22 +156,7 @@ class BayesOneHotClassifier {
             trainingStream.pipe(writable);
         });
     }
-    /**
-     * Save classifier data to file for futher use
-     * @param {string} file File name
-     * @param {object} classifier classifier data to save
-     * @returns {Promise.{object}}
-     */
-    save(file, classifier) {
-        return new Promise((resolve, reject) => {
-            classifier.save(file, (err) => {
-                if (err) {
-                    return reject(err);
-                }
-                resolve(classifier);
-            });
-        });
-    }
+
 }
 
 

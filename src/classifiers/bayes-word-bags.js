@@ -5,27 +5,29 @@ const
     StringTransform = require(path.join(__dirname, "..", "libraries",
         "string-transform")),
     stringTransform = new StringTransform(),
-    logger = require(path.join(__dirname, "..", "logger"));
-
+    logger = require(path.join(__dirname, "..", "logger")),
+    Promise = require("bluebird");
 
 class BayesWordBagsClassifier extends BayesClassifier {
 
     /**
      * Transform document
-     * @param {string|array} document
-     * @returns {string|array}
+     * @param {String|Array} document
+     * @returns {Promise<String|Array>}
      */
     transformDocument(document) {
-        const transformed = stringTransform.toLowerCase(
-            stringTransform.keepAlphaNum(
-                stringTransform.unaccent(
-                    document)))
-            .split(" ");
-        logger.info("bayes word bags transform", {
-            "transformed": transformed,
-            "document": document
+        return new Promise(resolve => {
+            const transformed = stringTransform.toLowerCase(
+                stringTransform.keepAlphaNum(
+                    stringTransform.unaccent(
+                        document)))
+                .split(" ");
+            logger.info("bayes word bags transform", {
+                "transformed": transformed,
+                "document": document
+            });
+            resolve(transformed);
         });
-        return transformed;
     }
 
 }
