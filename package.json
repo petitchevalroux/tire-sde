@@ -25,8 +25,7 @@
   },
   "dependencies": {
     "@petitchevalroux/corpus": "^1.1.0",
-    "@petitchevalroux/dataset-classes-map": "^1.2.0",
-    "@petitchevalroux/dataset-stream-to-xy": "^1.1.0",
+    "@petitchevalroux/dataset-classes-map": "^1.5.0",
     "@petitchevalroux/tokenizer-default": "^1.1.0",
     "@petitchevalroux/vector-bow-one-hot": "^1.1.0",
     "bluebird": "^3.5.3",

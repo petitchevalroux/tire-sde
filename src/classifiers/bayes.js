@@ -4,7 +4,6 @@ const NaturalBayesClassifier = require("natural")
         .BayesClassifier,
     Promise = require("bluebird"),
     path = require("path"),
-    logger = require(path.join(__dirname, "..", "logger")),
     RootClassifier = require(path.join(__dirname, "root"));
 class BayesClassifier extends RootClassifier {
 
@@ -53,16 +52,6 @@ class BayesClassifier extends RootClassifier {
                 resolve(loadedClassifier);
             });
         });
-    }
-
-    /**
-     * Transform document
-     * @param {String|Array} document
-     * @returns {String|Array}
-     */
-    transformDocument(document) {
-        logger.info("bayes transform", document);
-        return new Promise(resolve => resolve(document));
     }
 
     /**

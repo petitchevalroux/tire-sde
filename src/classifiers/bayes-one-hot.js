@@ -1,160 +1,128 @@
 "use strict";
-const Writable = require("stream")
-        .Writable,
-    Classifier = require("ml-naivebayes")
-        .GaussianNB,
+const Classifier = require("ml-naivebayes")
+        .MultinomialNB,
     Promise = require("bluebird"),
     path = require("path"),
-    logger = require(path.join(__dirname, "..", "logger")),
-    streamToXy = require("@petitchevalroux/dataset-stream-to-xy"),
-    {
-        Transform
-    } = require("stream"),
     Corpus = require("@petitchevalroux/corpus"),
     tokenize = require("@petitchevalroux/tokenizer-default"),
     Vectorizer = require("@petitchevalroux/vector-bow-one-hot"),
-    ClassesMap = require("@petitchevalroux/dataset-classes-map");
+    RootClassifier = require(path.join(__dirname, "root")),
+    ClassesMap = require("@petitchevalroux/dataset-classes-map"),
+    fs = require("fs");
 
-class BayesOneHotClassifier {
-
-    constructor() {
-        this.corpus = new Corpus();
-        this.tokenize = tokenize;
-        const vectorizer = new Vectorizer(),
-            self = this;
-        this.vectorize = bow => {
-            return vectorizer.getVector(bow, self.corpus);
-        };
-    }
-
+class BayesOneHotClassifier extends RootClassifier {
+    /**
+     * Classify a document
+     * @param {String} document
+     * @param {Classifier} classifier
+     * @returns {Promise<String>} resulting class
+     */
     classify(document, classifier) {
-        const classification = classifier.predict([this.transformDocument(
-            document)]);
-        logger.info("bayes one hot classify", {
-            "class": classification,
-            document: document
-        });
-        return classification[0];
+        return this.transformDocument(document, classifier)
+            .then(document => {
+                const classification = classifier.predict([document]);
+                try {
+                    return classifier.classes.getClass(classification[0]);
+                } catch (error) {
+                    return "";
+                }
+            });
     }
-
-
 
     /**
-     * Load classifier data from file file and return classifer
-     * @param {string} file
-     * @returns {Promise.classifier}
+     * Save classifier data to file for futher use
+     * @param {String} file File name
+     * @param {Object} classifier classifier data to save
+     * @returns {Promise<object>}
      */
-    load(file) {
+    save(file, classifier) {
         return new Promise((resolve, reject) => {
-            NaturalBayesClassifier.load(file, null, (error,
-                loadedClassifier) => {
+            const stream = fs.createWriteStream(file);
+            stream.end(JSON.stringify({
+                classifier: classifier.toJSON(),
+                classes: JSON.parse(classifier.classes.toJSON())
+            }), error => {
                 if (error) {
                     return reject(error);
                 }
-                resolve(loadedClassifier);
+                resolve();
             });
         });
     }
 
+    /**
+     * Load classifier data from file file and return classifer
+     * @param {String} file
+     * @returns {Promise<Classifier>}
+     */
+    load() {
+        return Promise.reject(new Error("load not implemented"));
+    }
 
     /**
      * Transform document
-     * @param {string|array} document
-     * @returns {string|array}
+     * @param {String|Array} document
+     * @returns {Promise<String|Array>}
      */
-    transformDocument(document) {
-        logger.info("bayes one not transform", document);
-        return this.vectorize(this.tokenize(document));
-    }
-
-    /**
-     * Train classifier classifier or create a new one and return it trained
-     * @param {stream.Readable} trainingStream
-     * @param {stream.Readable} classifier
-     * @returns {Promise<classifier>}
-     */
-    train(trainingStream, maxIterations, minImprovement, classifier) {
-        const self = this;
-        return streamToXy(
-            trainingStream.pipe(new Transform({
-                objectMode: true,
-                transform: (chunk, encoding, callback) => {
-                    callback(null, [chunk.document, chunk.class]);
-                }
-            })))
-            .then(([documents, classes]) => {
-                // Transform documents to bag of words
-                const bows = documents.map(document => self.tokenize(
-                    document));
-                return self.corpus.addBows(bows)
-                    .then(() => [bows, classes]);
-            })
-            .then(([bows, classes]) => {
-                // Transform bows to vectors
-                return Promise
-                    .all(bows.map(bow => self.vectorize(bow)))
-                    .then(vectors => [vectors, classes]);
-            })
-            .then(([vectors, classes]) => {
-                const toTrainClassifier = classifier ? classifier : new Classifier(),
-                    classesMap = new ClassesMap(classes);
-                toTrainClassifier.train(vectors, classesMap.toIntegers());
-                return toTrainClassifier;
-            });
-    }
-
-    /**
-     * Get classifier score comparing to trainingStream 
-     * @param {stream.Readable} trainingStream
-     * @param {object} classifier
-     * @returns {object}
-     */
-    score(trainingStream, classifier) {
-        const self = this;
-        return new Promise((resolve, reject) => {
-            let success = 0,
-                failures = 0;
-            const writable = new Writable({
-                "objectMode": true,
-                "write": (chunk, encoding, callback) => {
-                    const resultClass =
-                        classifier.classify(
-                            chunk.document);
-                    if (self.classify(chunk.document,
-                        classifier) ==
-                        chunk.class) {
-                        success++;
-                    } else {
-                        failures++;
-                    }
-                    logger.info(
-                        "bayes score compare", {
-                            "class": resultClass,
-                            chunk: chunk,
-                            "success": success,
-                            "failures": failures
-                        });
-                    callback();
-                }
-            });
-            writable.on("error", (error) => {
-                reject(error);
-            });
-            writable.on("finish", () => {
-                const stats = {
-                    "success": success,
-                    "failures": failures,
-                    "success rate": success / (
-                        success +
-                        failures)
-                };
-                logger.info(
-                    "bayes score statistics",
-                    stats);
-                resolve(stats);
-            });
-            trainingStream.pipe(writable);
+    transformDocument(document, classifier) {
+        return new Promise(resolve => {
+            resolve(classifier.vectorize(classifier.tokenize(
+                document), classifier.corpus));
         });
+    }
+
+    /**
+     * Create a new classifier
+     * @returns {Promise<Classifier>}
+     */
+    createClassifier() {
+        const classifier = new Classifier(),
+            vectorizer = new Vectorizer();
+        classifier.corpus = new Corpus();
+        classifier.vectorize = (bow, corpus) => {
+            return vectorizer.getVector(bow, corpus);
+        };
+        classifier.tokenize = (document) => {
+            return tokenize(document);
+        };
+        classifier.classes = new ClassesMap();
+        return Promise.resolve(classifier);
+    }
+
+    /**
+     * Learn classifier from document as label
+     * @param {String|Array} document after transformation
+     * @param {String|Interger} label after transformation
+     * @param {Classifier} classifier
+     * @return  {Array} [document,label]
+     */
+    learn(document, label, classifier) {
+        return new Promise(resolve => {
+            resolve([classifier.tokenize(document),
+                classifier.classes
+                    .add(label)
+            ]);
+        });
+    }
+
+    /**
+     * Finalyze training
+     * @param {Array} documents all transformed documents
+     * @param {Array} classes all transformed classes
+     * @param {Classifier} classifier 
+     * @return {Promise<Classifier>}
+     */
+    finalizeTraining(documents, labels, classifier) {
+        return classifier.corpus.addBows(documents)
+            .then(corpus => {
+                return Promise
+                    .all(documents.map(document => classifier
+                        .vectorize(document, corpus)))
+                    .then(vectors => {
+                        classifier.train(vectors, labels);
+                        return classifier;
+                    });
+            });
     }
 
 }

@@ -39,6 +39,7 @@ class RootClassifier {
     /**
      * Transform document
      * @param {String|Array} document
+     * @param {Classifier} classifier
      * @returns {Promise<String|Array>}
      */
     transformDocument(document) {
@@ -103,44 +104,26 @@ class RootClassifier {
                     const documents = [],
                         labels = [],
                         writable = new Writable({
-                            "objectMode": true,
-                            "write": (chunk, encoding,
-                                callback) => {
-                                Promise
-                                    .all([
-                                        self.transformDocument(
-                                            chunk.document,
-                                            classifier
-                                        ),
-                                        self.transformClass(
-                                            chunk.class,
-                                            classifier
-                                        )
-                                    ])
-                                    .then(([document,
-                                        label
-                                    ]) => self.learn(
-                                        document,
-                                        label,
-                                        classifier))
-                                    .then(([document,
-                                        label
-                                    ]) => {
-                                        documents.push(
-                                            document
-                                        );
-                                        labels.push(
-                                            label
-                                        );
-                                        return callback();
-                                    })
-                                    .catch(error => {
-                                        callback(
-                                            error
-                                        );
-                                    });
-                            }
-                        });
+                        "objectMode": true,
+                        "write": (chunk, encoding,
+                            callback) => {
+                                self.learn(
+                                    chunk.document,
+                                    chunk.class,
+                                    classifier
+                                )
+                                .then(([document,label]) => {
+                                    documents.push(document);
+                                    labels.push(label);
+                                    return callback();
+                                })
+                                .catch(error => {
+                                    callback(
+                                        error
+                                    );
+                                });
+                        }
+                    });
                     writable.on("error", (error) => {
                         reject(error);
                     });
