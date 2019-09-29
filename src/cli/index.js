@@ -72,4 +72,16 @@ require('yargs') // eslint-disable-line
             const command = new(require(path.join(__dirname, "trainingset")))();
             command.run(argv);
         })
+    .command(
+        "corpus", "corpus",
+        (yargs) => {
+            yargs
+                .positional("print-documents", {
+                    describe: "output all documents"
+                });
+        },
+        (argv) => {
+            const command = new(require(path.join(__dirname, "corpus")))();
+            command.run(argv);
+        })
     .argv;
