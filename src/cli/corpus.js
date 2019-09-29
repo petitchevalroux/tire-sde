@@ -5,7 +5,10 @@ const fs = require("fs"),
         .Writable,
     Promise = require("bluebird"),
     logger = require(path.join(__dirname, "..", "logger")),
-    process = require("process");
+    process = require("process"),
+    lowerCase = require("@petitchevalroux/string-lower-case"),
+    removeNonAlphaNum = require("@petitchevalroux/string-remove-non-alpha-num"),
+    removeAccents = require("@petitchevalroux/string-remove-accents");
 class CommandCorpus {
     run(options) {
         if (!options.verbose) {
@@ -44,6 +47,7 @@ class CommandCorpus {
     }
 
     handleDocument(document, options) {
+        const self = this;
         return new Promise((resolve, reject) => {
             if (options["print-documents"]) {
                 process.stdout.write(document + "\n", (error) => {
@@ -53,7 +57,20 @@ class CommandCorpus {
                     resolve();
                 });
             }
+            if (options["print-clean"]) {
+                process.stdout.write(self.cleanString(document) +
+                    "\n", (error) => {
+                    if (error) {
+                        return reject(error);
+                    }
+                    resolve();
+                });
+            }
         });
+    }
+
+    cleanString(string) {
+        return removeNonAlphaNum(lowerCase(removeAccents(string)));
     }
 }
 

@@ -24,6 +24,9 @@
     "sinon": "^4.1.3"
   },
   "dependencies": {
+    "@petitchevalroux/string-lower-case": "^1.1.0",
+    "@petitchevalroux/string-remove-accents": "^1.1.0",
+    "@petitchevalroux/string-remove-non-alpha-num": "^1.1.0",
     "bluebird": "^3.5.3",
     "compute-mean": "^3.0.0",
     "compute-quantile": "^1.0.1",
