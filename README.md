@@ -17,6 +17,21 @@ Sample output :
 
 ## Cli
 
+### Corpus
+```
+./src/cli/index.js corpus --help
+index.js corpus
+
+corpus
+
+Positionals:
+  print-documents  output all documents
+
+Options:
+  --help     Affiche de l'aide                                         [booléen]
+  --version  Affiche le numéro de version                              [booléen]
+```
+
 ### Training
 ```
 ./src/cli/index.js train --help
